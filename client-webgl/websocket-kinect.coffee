@@ -35,14 +35,15 @@ $ ->
   v = (x, y, z) -> new THREE.Vector3(x, y, z)
 
   renderer = new THREE.WebGLRenderer(antialias: true)
-#  effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} )
+  effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} )
+  stereo = false
 
   camera = new THREE.PerspectiveCamera(60, 1, 1, 10000)  # aspect (2nd param) shortly to be overridden...
 
   dvp = window.devicePixelRatio ? 1
   setSize = ->
     renderer.setSize(window.innerWidth * dvp, window.innerHeight * dvp)
-#    effect.setSize( window.innerWidth, window.innerHeight )
+    effect.setSize( window.innerWidth, window.innerHeight )
     renderer.domElement.style.width  = window.innerWidth + 'px'
     renderer.domElement.style.height = window.innerHeight + 'px'
     camera.aspect = window.innerWidth / window.innerHeight
@@ -93,7 +94,7 @@ $ ->
   dynaPan = 0
   sx = sy = 0
   camZRange = [2000, 200]
-  camZ = 880
+  camZ = 950
   camYRange = [-600, 600]
   camT = new Transform()
 
@@ -101,8 +102,7 @@ $ ->
     renderer.clear()
     [camera.position.x, camera.position.z] = camT.t(0.01 * camZ * dynaPan, camZ)
     camera.lookAt(scene.position)
-    renderer.render(scene, camera)
-#    effect.render(scene, camera)
+    (if stereo then effect else renderer).render(scene, camera)
     window.requestAnimationFrame(animate, renderer.domElement)
     stats.update() if params.stats
 
@@ -164,7 +164,7 @@ $ ->
     seenKeyFrame = yes
 
     [qtl, qtr, qbl, qbr] = [bytes[1], bytes[2], bytes[3], bytes[4]]
-    dynaPan = dynaPan * 0.9 + ((qtr + qbr) - (qtl + qbl)) * 0.1
+#    dynaPan = dynaPan * 0.9 + ((qtr + qbr) - (qtl + qbl)) * 0.1
 
     pIdx    = 0
     byteIdx = 5

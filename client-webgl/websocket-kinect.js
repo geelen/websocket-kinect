@@ -2,7 +2,7 @@
 (function() {
 
   $(function() {
-    var animate, bgColour, camT, camYRange, camZ, camZRange, camera, connect, currentOutArrayIdx, dataCallback, doCamPan, doCamZoom, down, drawControl, dvp, dynaPan, fgColour, h, i, inputH, inputW, k, kvp, outArrays, pLen, pMaterial, params, particle, particleSystem, particles, prevOutArrayIdx, projector, pvs, qbl, qbr, qtl, qtr, rawDataLen, renderer, scene, seenKeyFrame, setSize, startCamPan, stats, stopCamPan, sx, sy, togglePlay, useEvery, v, w, wls, x, xc, y, yc, _i, _j, _k, _len, _ref, _ref1, _ref2, _ref3;
+    var animate, bgColour, camT, camYRange, camZ, camZRange, camera, connect, currentOutArrayIdx, dataCallback, doCamPan, doCamZoom, down, drawControl, dvp, dynaPan, effect, fgColour, h, i, inputH, inputW, k, kvp, outArrays, pLen, pMaterial, params, particle, particleSystem, particles, prevOutArrayIdx, projector, pvs, qbl, qbr, qtl, qtr, rawDataLen, renderer, scene, seenKeyFrame, setSize, startCamPan, stats, stereo, stopCamPan, sx, sy, togglePlay, useEvery, v, w, wls, x, xc, y, yc, _i, _j, _k, _len, _ref, _ref1, _ref2, _ref3;
     if (!(window.WebGLRenderingContext && document.createElement('canvas').getContext('experimental-webgl') && window.WebSocket && new WebSocket('ws://.').binaryType)) {
       $('#noWebGL').show();
       return;
@@ -42,10 +42,15 @@
     renderer = new THREE.WebGLRenderer({
       antialias: true
     });
+    effect = new THREE.OculusRiftEffect(renderer, {
+      worldScale: 100
+    });
+    stereo = false;
     camera = new THREE.PerspectiveCamera(60, 1, 1, 10000);
     dvp = (_ref2 = window.devicePixelRatio) != null ? _ref2 : 1;
     setSize = function() {
       renderer.setSize(window.innerWidth * dvp, window.innerHeight * dvp);
+      effect.setSize(window.innerWidth, window.innerHeight);
       renderer.domElement.style.width = window.innerWidth + 'px';
       renderer.domElement.style.height = window.innerHeight + 'px';
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -99,7 +104,7 @@
     dynaPan = 0;
     sx = sy = 0;
     camZRange = [2000, 200];
-    camZ = 880;
+    camZ = 950;
     camYRange = [-600, 600];
     camT = new Transform();
     animate = function() {
@@ -107,7 +112,7 @@
       renderer.clear();
       _ref3 = camT.t(0.01 * camZ * dynaPan, camZ), camera.position.x = _ref3[0], camera.position.z = _ref3[1];
       camera.lookAt(scene.position);
-      renderer.render(scene, camera);
+      (stereo ? effect : renderer).render(scene, camera);
       window.requestAnimationFrame(animate, renderer.domElement);
       if (params.stats) {
         return stats.update();
@@ -179,7 +184,6 @@
       }
       seenKeyFrame = true;
       _ref5 = [bytes[1], bytes[2], bytes[3], bytes[4]], qtl = _ref5[0], qtr = _ref5[1], qbl = _ref5[2], qbr = _ref5[3];
-      dynaPan = dynaPan * 0.9 + ((qtr + qbr) - (qtl + qbl)) * 0.1;
       pIdx = 0;
       byteIdx = 5;
       for (y = _l = 0; 0 <= h ? _l < h : _l > h; y = 0 <= h ? ++_l : --_l) {

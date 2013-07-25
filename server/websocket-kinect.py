@@ -116,7 +116,7 @@ class Kinect:
 
     self.pixelDiffs = False
 
-    self.medianOf = 3  # must be odd, or we'll get artefacts; 3 or 5 are the sweet spot
+    self.medianOf = 1  # must be odd, or we'll get artefacts; 3 or 5 are the sweet spot
     zeros = numpy.zeros((self.h, self.w))
     self.depths = []
     for i in range(self.medianOf - 1):
@@ -190,7 +190,8 @@ class Kinect:
     self.currentFrame += 1
     self.currentFrame %= self.keyFrameEvery
 
-  def bodyCallback(self, *args):
+  def bodyCallback(self, dev, ctx):
+    print freenect.get_accel(dev)
     if not self.kinecting: raise freenect.Kill
 
   def runInOtherThread(self):
